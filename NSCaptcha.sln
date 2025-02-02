@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSCaptcha", "NSCaptcha\NSCaptcha.csproj", "{7BC7EC85-B886-4992-83EE-D509FB5C0314}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSCaptcha.Test", "NSCaptcha.Test\NSCaptcha.Test.csproj", "{F8DCDBF2-E438-4EB4-A0A7-D575AE039725}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7BC7EC85-B886-4992-83EE-D509FB5C0314}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BC7EC85-B886-4992-83EE-D509FB5C0314}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BC7EC85-B886-4992-83EE-D509FB5C0314}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BC7EC85-B886-4992-83EE-D509FB5C0314}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8DCDBF2-E438-4EB4-A0A7-D575AE039725}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8DCDBF2-E438-4EB4-A0A7-D575AE039725}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8DCDBF2-E438-4EB4-A0A7-D575AE039725}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8DCDBF2-E438-4EB4-A0A7-D575AE039725}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,6 @@
+@NCaptcha.Test_HostAddress = http://localhost:5229
+
+GET {{NCaptcha.Test_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
