@@ -1,4 +1,4 @@
-﻿namespace NCaptcha;
+﻿namespace NSCaptcha;
 
 /// <summary>
 /// Represents a Captcha response containing the image data, captcha value, and a unique token.

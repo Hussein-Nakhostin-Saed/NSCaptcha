@@ -1,4 +1,4 @@
-﻿namespace NCaptcha;
+﻿namespace NSCaptcha;
 
 //public enum CaptchaType
 //{
@@ -9,13 +9,13 @@
 
 public enum CaptchaValueSendType
 {
-	InHeader = 1,
-	InBody = 2,
+    InHeader = 1,
+    InBody = 2,
 }
 public enum EncoderTypes
 {
-	Jpeg,
-	Png,
+    Jpeg,
+    Png,
 }
 
 public enum FontStyle

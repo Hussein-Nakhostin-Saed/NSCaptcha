@@ -1,5 +1,4 @@
 ﻿global using Microsoft.AspNetCore.Http;
-global using Microsoft.AspNetCore.Mvc;
 global using SixLabors.Fonts;
 global using SixLabors.ImageSharp;
 global using SixLabors.ImageSharp.Drawing.Processing;

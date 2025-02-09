@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NSCaptcha;
 
 namespace NCaptcha.Test.Controllers;
 
@@ -6,8 +7,8 @@ namespace NCaptcha.Test.Controllers;
 [ApiController]
 public class CreationController : ControllerBase
 {
-    private readonly ICaptchaServices _captchaService;
-    public CreationController(ICaptchaServices captchaService)
+    private readonly ICaptchaService _captchaService;
+    public CreationController(ICaptchaService captchaService)
     {
         _captchaService = captchaService;
     }
