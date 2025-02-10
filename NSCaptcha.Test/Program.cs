@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using NSCaptcha;
 using NSCaptcha.Test.Services;
 
@@ -8,18 +9,24 @@ builder.Services.AddControllers();
 
 builder.Services.AddDataProtection().SetApplicationName("CaptchaValidator").PersistKeysToFileSystem(new DirectoryInfo(Path.Combine("C:/Users/Hussein Nakhostin/Desktop")));
 builder.Services.AddMemoryCache();
-
+builder.Services.Configure<KestrelServerOptions>(options =>
+{
+    options.AllowSynchronousIO = true;
+});
 builder.Services.AddCaptcha();
 
-
+//builder.Services.AddControllers(options =>
+//{
+//    options.Filters.Add<ValidateCaptchaTestAttribute>();
+//});
 
 var app = builder.Build();
 
-app.Use(async (context, next) =>
-{
-    context.Request.EnableBuffering();
-    await next();
-});
+//app.Use(async (context, next) =>
+//{
+//    context.Request.EnableBuffering();
+//    await next();
+//});
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
 //{

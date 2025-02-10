@@ -1,64 +1,94 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace NSCaptcha;
 
 /// <summary>
-/// This class implements an action filter that validates a Captcha challenge before 
-/// allowing the execution of a controller action.
+/// An action filter attribute that validates a Captcha value submitted with a request.
 /// </summary>
 public class ValidateCaptchaAttribute : ActionFilterAttribute
 {
     /// <summary>
-    /// This method is called asynchronously before the action method is executed.
-    /// It retrieves the Captcha services from the dependency injection container, 
-    /// reads the Captcha value from the request body, validates it, and throws an exception
-    /// if the validation fails. If the Captcha is valid, the action method is allowed to proceed.
+    /// Asynchronously executes the action filter.
     /// </summary>
-    /// <param name="context">The action execution context containing information about the current request and action.</param>
-    /// <param name="next">The delegate to invoke to execute the action method.</param>
-    /// <returns>An asynchronous task representing the completion of the action filter execution.</returns>
+    /// <param name="context">The action executing context.</param>
+    /// <param name="next">The delegate to execute the next action filter or action.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public async override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        // Get the ICaptchaServices instance used for Captcha validation.
+        // 1. Fetch the Captcha value from the request.
+        var captchaValue = FetchCaptchaValue(context);
+
+        // 2. Get the Captcha service from dependency injection.
         var capatchaServices = context.HttpContext.RequestServices.GetService<ICaptchaService>()!;
 
-        // Get the HttpRequest object representing the incoming request.
-        var request = context.HttpContext.Request;
+        // 3. Validate the Captcha value.
+        if (!capatchaServices.Validate(captchaValue))
+            throw new CaptchaException(); // Throw a custom exception if validation fails.
 
-        // Access the request body stream containing the request data.
-        var body = request.Body;
+        // 4. Call the next action filter or the action itself.
+        await base.OnActionExecutionAsync(context, next);
+    }
 
-        // Reset the stream position to the beginning to ensure we can read the entire body.
-        body.Seek(0, SeekOrigin.Begin);
-
-        // Create a StreamReader to read the request body content as a string.
-        using (var reader = new StreamReader(body))
+    /// <summary>
+    /// Extracts the Captcha value from the request arguments.  This method supports various ways the Captcha
+    /// value might be passed, including within a JSON object passed in the request body.
+    /// </summary>
+    /// <param name="context">The action executing context.</param>
+    /// <returns>The Captcha value as a string, or null if not found.</returns>
+    /// <exception cref="CaptchaException">Thrown if the Captcha value is not found in the request.</exception>
+    private string FetchCaptchaValue(ActionExecutingContext context)
+    {
+        // 1. Iterate through the action arguments.
+        var arguments = context.ActionArguments.ToArray();
+        foreach (var argument in arguments)
         {
-            // Read the entire request body as a string asynchronously.
-            var requestBody = await reader.ReadToEndAsync();
+            // 2. Serialize the argument to JSON. This allows us to handle different input formats.
+            var argumentSerialized = JsonConvert.SerializeObject(argument);
 
-            // Deserialize the request body string into a CaptchaValidationRequest object containing the Captcha value.
-            var captchaValidationRequest = JsonConvert.DeserializeObject<CaptchaValidationRequest>(requestBody);
+            // 3. Parse the serialized argument as a JsonDocument.
+            using (var document = JsonDocument.Parse(argumentSerialized))
+            {
+                JsonElement jsonElement;
+                JsonProperty elementObject;
 
-            // Validate the Captcha value using the injected ICaptchaServices service.
-            if (!capatchaServices.Validate(captchaValidationRequest.CaptchaValue))
-                throw new CaptchaException();
+                // 4. Try to get the "Value" property. This supports cases where the Captcha is nested.
+                document.RootElement.TryGetProperty("Value", out jsonElement);
+
+                // 5. Check if "CaptchaValue" exists directly under "Value".
+                if (jsonElement.TryGetProperty("CaptchaValue", out JsonElement captchajsonElement))
+                    return captchajsonElement.GetString()!;
+
+                // 6. If not directly under "Value", iterate through the properties of "Value" 
+                //    to find "CaptchaValue" in nested objects.
+                elementObject = jsonElement.EnumerateObject().First();
+
+                while (jsonElement.TryGetProperty(elementObject.Name, out jsonElement))
+                {
+                    // 7. Check if the current property is "CaptchaValue".
+                    if (elementObject.NameEquals("CaptchaValue"))
+                        return jsonElement.GetString()!;
+
+                    elementObject = jsonElement.EnumerateObject().First(); // Move to the next nested object
+                }
+            }
         }
 
-        // If the Captcha validation passes, call the next delegate in the filter pipeline to execute the action method.
-        await base.OnActionExecutionAsync(context, next);
+        // 8. Throw an exception if the Captcha value is not found.
+        throw new CaptchaException("Captcha value is null");
     }
 }
 
 /// <summary>
-/// This class defines a simple data structure to hold the Captcha value submitted by the client.
+/// Represents a request containing a Captcha value.  This class is typically used for deserialization
+/// of the request body when the Captcha is submitted as part of a JSON payload.
 /// </summary>
 public class CaptchaValidationRequest
 {
     /// <summary>
-    /// The Captcha value submitted by the client.
+    /// The Captcha value.
     /// </summary>
     public string CaptchaValue { get; set; }
 }
