@@ -8,8 +8,24 @@ namespace NSCaptcha;
 /// <summary>
 /// An action filter attribute that validates a Captcha value submitted with a request.
 /// </summary>
+[AttributeUsage(AttributeTargets.Method)]
 public class ValidateCaptchaAttribute : ActionFilterAttribute
 {
+    private readonly bool _expireAfterValidation;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValidateCaptchaAttribute"/> class.
+    /// This attribute is used to validate CAPTCHA responses in ASP.NET MVC actions.
+    /// </summary>
+    /// <param name="expireAfterValidation">
+    /// A boolean value indicating whether the CAPTCHA should expire after successful validation.
+    /// If set to <c>true</c> (the default), the CAPTCHA will be considered invalid after it has been successfully verified.
+    /// If set to <c>false</c>, the CAPTCHA will remain valid and can be reused (less secure, use with caution).
+    /// </param>
+    public ValidateCaptchaAttribute(bool expireAfterValidation = true)
+    {
+        _expireAfterValidation = expireAfterValidation;
+    }
+
     /// <summary>
     /// Asynchronously executes the action filter.
     /// </summary>
@@ -27,6 +43,10 @@ public class ValidateCaptchaAttribute : ActionFilterAttribute
         // 3. Validate the Captcha value.
         if (!capatchaServices.Validate(captchaValue))
             throw new CaptchaException(); // Throw a custom exception if validation fails.
+
+        //4. Expire captcha if _expireAfterValidation will be true
+        if (_expireAfterValidation)
+            capatchaServices.Expire();
 
         // 4. Call the next action filter or the action itself.
         await base.OnActionExecutionAsync(context, next);

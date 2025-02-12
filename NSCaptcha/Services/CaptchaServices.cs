@@ -82,6 +82,19 @@ public class CaptchaService : ICaptchaService
     }
 
     /// <summary>
+    /// Expires the current CAPTCHA token, clearing it from the cache, 
+    /// resetting the token serializer, and resetting the internal counter.
+    /// This method is typically called when a CAPTCHA challenge is successfully 
+    /// solved or when it's time to generate a new CAPTCHA.
+    /// </summary>
+    public void Expire()
+    {
+        _captchaTokenCache.Clear(_tokenCacheKey);
+        _tokenSerializer.Clear();
+        _counter.Reset();
+    }
+
+    /// <summary>
     /// This private helper method checks if the Captcha needs refresh based on attempt count or expiration time.
     /// It resets the counter and clears the cached and cookie values if refresh is required.
     /// </summary>
