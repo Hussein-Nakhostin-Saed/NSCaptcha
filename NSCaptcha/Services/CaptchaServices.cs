@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NSCaptcha.Utilities;
-using NSCaptcha;
+
 namespace NSCaptcha;
 
 public class CaptchaService : ICaptchaService
@@ -35,6 +35,7 @@ public class CaptchaService : ICaptchaService
     /// <returns>A new Captcha object.</returns>
     public Captcha Create()
     {
+        _counter.Reset();
         var randomStringModel = new RandomStringModel(_options.IncludeUpperCaseLetters,
                                                       _options.IncludeLowerCaseLetters,
                                                       _options.IncludeDigits,

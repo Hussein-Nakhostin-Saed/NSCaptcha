@@ -17,7 +17,7 @@ public class ValidationController : ControllerBase
     [Route("validate")]
     [HttpPost]
     [ValidateCaptcha]
-    public async Task Validate([FromBody] CaptchaTest3 valued)
+    public async Task Validate(CaptchaTest6 valued)
     {
     }
 }
@@ -48,5 +48,5 @@ public class CaptchaTest5
 
 public class CaptchaTest6
 {
-    public string CaptchaValue { get; set; }
+    public string? CaptchaValue { get; set; }
 }

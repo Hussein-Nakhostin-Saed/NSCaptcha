@@ -34,11 +34,11 @@ public class ValidateCaptchaAttribute : ActionFilterAttribute
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        // 1. Fetch the Captcha value from the request.
-        var captchaValue = FetchCaptchaValue(context);
-
-        // 2. Get the Captcha service from dependency injection.
+        // 1. Get the Captcha service from dependency injection.
         var capatchaServices = context.HttpContext.RequestServices.GetService<ICaptchaService>()!;
+
+        // 2. Fetch the Captcha value from the request.
+        var captchaValue = FetchCaptchaValue(context);
 
         // 3. Validate the Captcha value.
         if (!capatchaServices.Validate(captchaValue))
@@ -79,7 +79,13 @@ public class ValidateCaptchaAttribute : ActionFilterAttribute
 
                 // 5. Check if "CaptchaValue" exists directly under "Value".
                 if (jsonElement.TryGetProperty("CaptchaValue", out JsonElement captchajsonElement))
-                    return captchajsonElement.GetString()!;
+                {
+                    var capValue = captchajsonElement.GetString();
+                    if (string.IsNullOrEmpty(capValue))
+                        break;
+                    else
+                        return capValue;
+                }
 
                 // 6. If not directly under "Value", iterate through the properties of "Value" 
                 //    to find "CaptchaValue" in nested objects.
@@ -89,7 +95,13 @@ public class ValidateCaptchaAttribute : ActionFilterAttribute
                 {
                     // 7. Check if the current property is "CaptchaValue".
                     if (elementObject.NameEquals("CaptchaValue"))
-                        return jsonElement.GetString()!;
+                    {
+                        var capValue = jsonElement.GetString();
+                        if (string.IsNullOrEmpty(capValue))
+                            break;
+                        else
+                            return capValue;
+                    }
 
                     elementObject = jsonElement.EnumerateObject().First(); // Move to the next nested object
                 }

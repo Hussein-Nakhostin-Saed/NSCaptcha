@@ -41,9 +41,12 @@ public class CookieCaptchaTokenSerializer : ICaptchaTokenSerializer
     /// <exception cref="CaptchaException">Thrown when the cookie with the specified name does not exist.</exception>
     public string Deserialize()
     {
+        if (!_contextAccessor.HttpContext.Request.Cookies.Any())
+            throw new CaptchaException("Cookie value does not exist");
+
         var fromCookieCaptcha = _contextAccessor.HttpContext.Request.Cookies[_cookieOptions.Name];
-        if (string.IsNullOrEmpty(fromCookieCaptcha.Trim()))
-            throw new CaptchaException("Cookie Key does not exist");
+        if (string.IsNullOrEmpty(fromCookieCaptcha))
+            throw new CaptchaException("Cookie value does not exist");
 
         return fromCookieCaptcha;
     }
