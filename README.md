@@ -47,15 +47,6 @@ captchaBuilder.AddCaptcha(new CaptchaOptions(new TimeSpan(0, 0, 30)))
     .AddCaptchaTokenCacheService<InMemoryCaptchaTokenCacheService>()
     .Build();
 ````
-
-**After App Build**
-```csharp
-app.Use(async (context, next) =>
-{
-    context.Request.EnableBuffering();
-    await next();
-});
-````
 **Create Captcha**
 ```csharp
 [Route("api/captcha/create")]
